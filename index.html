@@ -29,6 +29,9 @@
         let ballSpeedX = 3;
         let ballSpeedY = 2;
 
+        let playerScore = 0;
+        let aiScore = 0;
+
         const drawPaddle = (x, y) => {
             ctx.fillStyle = 'white';
             ctx.fillRect(x, y, paddleWidth, paddleHeight);
@@ -39,11 +42,18 @@
             ctx.fillRect(x, y, ballSize, ballSize);
         };
 
+        const drawScores = () => {
+            ctx.font = '24px Arial';
+            ctx.fillText(playerScore, canvas.width / 2 - 50, 30);
+            ctx.fillText(aiScore, canvas.width / 2 + 50, 30);
+        };
+
         const draw = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawPaddle(10, playerY);
             drawPaddle(canvas.width - 10 - paddleWidth, aiY);
             drawBall(ballX, ballY);
+            drawScores();
         };
 
         const update = () => {
@@ -54,10 +64,12 @@
                 ballSpeedY = -ballSpeedY;
             }
 
-            if (ballX < 0 || ballX > canvas.width - ballSize) {
-                ballX = canvas.width / 2;
-                ballY = canvas.height / 2;
-                ballSpeedX = -ballSpeedX;
+            if (ballX < 0) {
+                aiScore++;
+                resetBall();
+            } else if (ballX > canvas.width - ballSize) {
+                playerScore++;
+                resetBall();
             }
 
             if (ballX < 10 + paddleWidth && ballY > playerY && ballY < playerY + paddleHeight) {
@@ -69,6 +81,13 @@
             }
 
             aiY = ballY - paddleHeight / 2;
+        };
+
+        const resetBall = () => {
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+            ballSpeedX = -ballSpeedX;
+            ballSpeedY = 2;
         };
 
         const gameLoop = () => {
