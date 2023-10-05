@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong Game</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="pongCanvas" width="640" height="480"></canvas>
+    <script>
+        const canvas = document.getElementById('pongCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const paddleWidth = 10;
+        const paddleHeight = 75;
+        const ballSize = 10;
+
+        let playerY = (canvas.height - paddleHeight) / 2;
+        let aiY = (canvas.height - paddleHeight) / 2;
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        let ballSpeedX = 3;
+        let ballSpeedY = 2;
+
+        let playerScore = 0;
+        let aiScore = 0;
+
+        const drawPaddle = (x, y) => {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(x, y, paddleWidth, paddleHeight);
+        };
+
+        const drawBall = (x, y) => {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(x, y, ballSize, ballSize);
+        };
+
+        const drawScores = () => {
+            ctx.font = '24px Arial';
+            ctx.fillText(playerScore, canvas.width / 2 - 50, 30);
+            ctx.fillText(aiScore, canvas.width / 2 + 50, 30);
+        };
+
+        const draw = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPaddle(10, playerY);
+            drawPaddle(canvas.width - 10 - paddleWidth, aiY);
+            drawBall(ballX, ballY);
+            drawScores();
+        };
+
+        const update = () => {
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+
+            if (ballY < 0 || ballY > canvas.height - ballSize) {
+                ballSpeedY = -ballSpeedY;
+            }
+
+            if (ballX < 0) {
+                aiScore++;
+                resetBall();
+            } else if (ballX > canvas.width - ballSize) {
+                playerScore++;
+                resetBall();
+            }
+
+            if (ballX < 10 + paddleWidth && ballY > playerY && ballY < playerY + paddleHeight) {
+                ballSpeedX = -ballSpeedX;
+            }
+
+            if (ballX > canvas.width - 10 - paddleWidth * 2 && ballY > aiY && ballY < aiY + paddleHeight) {
+                ballSpeedX = -ballSpeedX;
+            }
+
+            aiY = ballY - paddleHeight / 2;
+        };
+
+        const resetBall = () => {
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+            ballSpeedX = -ballSpeedX;
+            ballSpeedY = 2;
+        };
+
+        const gameLoop = () => {
+            draw();
+            update();
+            requestAnimationFrame(gameLoop);
+        };
+
+        document.addEventListener('mousemove', (event) => {
+            const canvasRect = canvas.getBoundingClientRect();
+            playerY = event.clientY - canvasRect.top - paddleHeight / 2;
+        });
+
+        gameLoop();
+    </script>
+</body>
+</html>
